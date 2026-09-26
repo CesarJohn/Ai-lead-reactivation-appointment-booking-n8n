@@ -122,7 +122,7 @@ Successfully tested:
 
 ### Lead Reactivation Workflow
 
-![Lead Reactivation Workflow](workflow1.png)
+![Lead Reactivation Workflow](workflow1.jpg)
 
 ### Reply Handling & Appointment Booking Workflow
 
