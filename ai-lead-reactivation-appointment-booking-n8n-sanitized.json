@@ -1,0 +1,1555 @@
+{
+  "name": "AI Lead Reactivation & Appointment Booking — n8n",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1632,
+        400
+      ],
+      "id": "7e1b69ed-3231-4d31-8fcc-b8e326a56bc5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "60b9496b-70af-4613-b3dc-bd1504df6ab9",
+              "leftValue": "={{ $json[\"Previous Status\"] }}",
+              "rightValue": "Inactive",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1184,
+        400
+      ],
+      "id": "9f122411-9918-49ef-98f0-22fb0bdbbfa2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5f164710-9628-4119-b899-6b42924f48a7",
+              "leftValue": "={{ $json[\"Opted Out\"] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -960,
+        304
+      ],
+      "id": "f6cf48af-6bbe-445f-9412-7cae3c890578",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"AI Category\"] }}",
+                    "rightValue": "Hot",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5d3ee3cf-ab9a-49b2-a8a4-063159514af2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f23fe11a-e336-4294-9be6-e1914ef98c71",
+                    "leftValue": "={{ $json[\"AI Category\"] }}",
+                    "rightValue": "Warm",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Warm"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "42ef9b97-2099-4d0f-8c85-7073d5d7ea53",
+                    "leftValue": "={{ $json[\"AI Category\"] }}",
+                    "rightValue": "Low Priority",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Low Priority"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        192
+      ],
+      "id": "9e741d74-ab1d-4aca-bb87-d1d182d37b2f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        192
+      ],
+      "id": "1fb771f1-349d-4888-bd93-cb872ab85155",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43792452-a320-455d-82ee-74b3a25c9c26",
+              "name": "AI Message",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "0b6f2211-feaf-4264-b18d-c486c0d23993",
+              "name": "Lead ID",
+              "value": "={{ $('If1').item.json['Lead ID'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8e1b62ce-6739-4cfc-b026-ad000533a861",
+              "name": "Name",
+              "value": "={{ $('If1').item.json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "bd4d5af6-32ba-4c7c-9898-4e2037769d0f",
+              "name": "AI Category",
+              "value": "={{ $('Switch').item.json[\"AI Category\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "9e3c643a-c0a0-4c0f-b704-ee473e37b620",
+              "name": "Email",
+              "value": "={{ $('If1').item.json.Email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        336,
+        0
+      ],
+      "id": "2223c3a3-fcae-4ec7-9ae7-fe1617f92e10",
+      "name": "HOT"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43792452-a320-455d-82ee-74b3a25c9c26",
+              "name": "AI Message",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "0b6f2211-feaf-4264-b18d-c486c0d23993",
+              "name": "Lead ID",
+              "value": "={{ $('If1').item.json['Lead ID'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8e1b62ce-6739-4cfc-b026-ad000533a861",
+              "name": "Name",
+              "value": "={{ $('If1').item.json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "bd4d5af6-32ba-4c7c-9898-4e2037769d0f",
+              "name": "AI Category",
+              "value": "={{ $('Switch').item.json[\"AI Category\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "484d2c85-98a2-4528-991b-336ca2f6c2cf",
+              "name": "Email",
+              "value": "={{ $('If1').item.json.Email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        336,
+        208
+      ],
+      "id": "3e3df107-e76e-4a23-beb8-a8139f0c5330",
+      "name": "WARM"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43792452-a320-455d-82ee-74b3a25c9c26",
+              "name": "AI Message",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "0b6f2211-feaf-4264-b18d-c486c0d23993",
+              "name": "Lead ID",
+              "value": "={{ $('If1').item.json['Lead ID'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8e1b62ce-6739-4cfc-b026-ad000533a861",
+              "name": "Name",
+              "value": "={{ $('If1').item.json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "bd4d5af6-32ba-4c7c-9898-4e2037769d0f",
+              "name": "AI Category",
+              "value": "={{ $('Switch').item.json[\"AI Category\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "e1d73f9f-4cc3-4b70-bff2-089f2bba5492",
+              "name": "Email",
+              "value": "={{ $('If1').item.json.Email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        336,
+        416
+      ],
+      "id": "37e8df17-b56b-4679-bf4b-db15c645b0ca",
+      "name": "LOW PRIO"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a real estate reactivation assistant.\n\nCreate a short, friendly, low-pressure reactivation message for this previous lead.\n\nLead information:\n\nName:{{ $('If1').item.json.Name }}\nProperty Interest:{{ $('If1').item.json[\"Property Interest\"] }}\nBudget: {{ $('If1').item.json.Budget }}\nLocation:{{ $('If1').item.json.Location }}\nAI Category: {{ $json[\"AI Category\"] }}\n\nRequirements:\n- Address the lead by first name.\n- Mention their previous property interest.\n- Keep the message short and natural.\n- Use a gentle, low-pressure tone.\n- Do not mention that AI was used.\n- Do not make up property details.\n- Do not use aggressive sales language.\n- End with a simple question asking if they are still interested.\n- Return only the message."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        416
+      ],
+      "id": "f1a667ac-671e-4c58-9a30-ec4fe6e5e40b",
+      "name": "Message for low prio"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a real estate reactivation assistant.\n\nCreate a short, friendly, personalized reactivation message for this previous lead.\n\nLead information:\n\nName:{{ $('If1').item.json.Name }}\nProperty Interest:{{ $('If1').item.json['Property Interest'] }}\nBudget:{{ $('If1').item.json.Budget }}\nLocation:{{ $('If1').item.json.Location }}\nAI Category: {{ $json[\"AI Category\"] }}\n\nRequirements:\n- Address the lead by first name.\n- Mention their previous property interest.\n- Keep the message short and natural.\n- Do not mention that AI was used.\n- Do not make up property details.\n- Do not use aggressive sales language.\n- End with a simple question asking if they are still interested.\n- Return only the message."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        208
+      ],
+      "id": "ae2e6d6c-7940-4f84-b821-bb2904a055ac",
+      "name": "Message for warm"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a real estate reactivation assistant.\n\nCreate a short, friendly, personalized reactivation message for this previous lead.\n\nLead information:\n\nName: {{ $('If1').item.json.Name }}\nProperty Interest:{{ $('If1').item.json[\"Property Interest\"] }}\nBudget:{{ $('If1').item.json.Budget }}\nLocation: {{ $('If1').item.json.Location }}\nAI Category: {{ $json[\"AI Category\"] }}\n\nRequirements:\n- Address the lead by first name.\n- Mention their previous property interest.\n- Keep the message short and natural.\n- Because this is a Hot lead, use a slightly more proactive tone.\n- Do not mention that AI was used.\n- Do not make up property details.\n- Do not use aggressive sales language.\n- End with a simple question asking if they are still interested.\n- Return only the message."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "affaf030-811f-4abb-b0dc-5843e012c1fd",
+      "name": "Message for hot"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Classify the lead into exactly one category: Hot, Warm, or Low Priority.\n\nIMPORTANT: Use the Budget value as the PRIMARY factor.\n\nFollow these exact rules:\n\n1. HOT\nIf Budget >= 4000000, classify as Hot.\n\n2. WARM\nIf Budget >= 2500000 AND Budget < 4000000, classify as Warm.\n\n3. LOW PRIORITY\nIf Budget < 2500000, classify as Low Priority.\n\nDo NOT override these budget rules based on property type, location, previous status, or any other information.\n\nReturn ONLY one of these exact values:\nHot\nWarm\nLow Priority\nLead information:\n\nName: {{ $json.Name }}\nProperty Interest: {{ $json[\"Property Interest\"] }}\nBudget: {{ $json.Budget }}\nLocation: {{ $json.Location }}\nLast Contact: {{ $json[\"Last Contact\"] }}\nPrevious Status: {{ $json[\"Previous Status\"] }}\nOpted Out: {{ $json[\"Opted Out\"] }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -736,
+        208
+      ],
+      "id": "1ccf0938-f911-4239-aa7d-1a40b1f04ad4",
+      "name": "Lead_Classification"
+    },
+    {
+      "parameters": {
+        "content": "AI Lead Reactivation & Appointment Booking — n8n",
+        "height": 80,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2096,
+        624
+      ],
+      "id": "e6b0fdda-07de-4ce9-abba-23287f65f134",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d716f05-1c04-42e7-8a11-66fc8d6094f3",
+              "name": "AI Category",
+              "value": "={{ $json.output[0].content[0].text.trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -432,
+        208
+      ],
+      "id": "390c45e8-65ca-4fe9-858a-58676fae5b23",
+      "name": "Manual Mapping"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=Following Up on Your Property Search",
+        "emailType": "text",
+        "message": "={{ $json[\"AI Message\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        208
+      ],
+      "id": "0e1d6b47-e56b-4899-84f8-1095306f7049",
+      "name": "Message_to_Campaign_Log"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Lead Reactivation System — Database"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1408,
+        400
+      ],
+      "id": "425d5890-3cfb-41c7-a1dd-fd70291b069a",
+      "name": "Get row(s) in sheet 1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1632,
+        816
+      ],
+      "id": "21d61424-07d6-4adc-9cd2-477f87b277f6",
+      "name": "Gmail Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Lead Reactivation System — Database"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 25583086,
+          "mode": "list",
+          "cachedResultName": "Sheet2"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Campaign ID": "={{ 'CAMP-' + $('Merge').item.json[\"Lead ID\"] + '-' + $now.toMillis() }}",
+            "Lead ID": "={{ $('Merge').item.json[\"Lead ID\"] }}",
+            "Channel": "Email",
+            "Message": "={{ $('Merge').item.json[\"AI Message\"] }}",
+            "Status ": "Sent",
+            "Date Sent": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Campaign ID",
+              "displayName": "Campaign ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date Sent",
+              "displayName": "Date Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Channel",
+              "displayName": "Channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status ",
+              "displayName": "Status ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        208
+      ],
+      "id": "bae8e751-f0a1-4cb5-adf7-5888732c02e8",
+      "name": "Campaign_Append row in sheet 2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2438ce0-90e9-45c6-bb30-72b8fd84d056",
+              "name": "Gmail Message ID",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "dd6b7ae6-2938-4e73-83be-0c8d4b4029f9",
+              "name": "Thread ID",
+              "value": "={{ $json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "ff8002f3-ad38-459a-ae70-8d29a31de556",
+              "name": "Reply Message",
+              "value": "={{ $json.text || $json.html }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1408,
+        816
+      ],
+      "id": "b822258f-f825-40fe-9f27-059482233558",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Classify this lead reply into exactly one of these intents:\n\nInterested\nNot Interested\nWants Appointment\n\nRules:\n- If the lead says they are still interested, wants more details, wants listings, or wants to continue the conversation, return: Interested\n- If the lead says no, stop, not interested, already bought, or does not want further contact, return: Not Interested\n- If the lead asks to schedule, meet, call, view a property, book, or mentions a preferred appointment time, return: Wants Appointment\n\nLead reply:\n{{ $json[\"Reply Message\"] }}\n\nReturn ONLY one exact value:\nInterested\nNot Interested\nWants Appointment"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -1184,
+        816
+      ],
+      "id": "619dd95a-c5ae-4b9a-bd82-f2998a058d76",
+      "name": "Message a model"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa21159d-5942-49a2-afd2-0ea92939778f",
+              "name": "Intent",
+              "value": "={{ $json.output[0].content[0].text.trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -832,
+        816
+      ],
+      "id": "473485a6-c24f-4e1c-b476-04662dcc2624",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a real estate assistant.\n\nWrite a short, friendly follow-up reply to a lead who is interested in continuing their property search.\n\nLead's message:\n{{ $('Edit Fields').item.json[\"Reply Message\"] }}\n\nRequirements:\n- Thank them for replying.\n- Acknowledge that they are interested.\n- Keep it short and natural.\n- Do not invent property details.\n- Do not mention AI.\n- Ask if they would like more information or available property options.\n- Return ONLY the email reply."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        624
+      ],
+      "id": "28c10e32-5162-4302-8456-496e099289e3",
+      "name": "Message for interested"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Edit Fields').item.json[\"Gmail Message ID\"] }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        624
+      ],
+      "id": "f52c26e1-df6f-44ef-b107-0a992f6b453f",
+      "name": "Reply to a message"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Lead Reactivation System — Database"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Opted Out": "Yes",
+            "Email": "={{ $('Gmail Trigger').item.json.from.value[0].address }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Property Interest",
+              "displayName": "Property Interest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Contact",
+              "displayName": "Last Contact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Previous Status",
+              "displayName": "Previous Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Opted Out",
+              "displayName": "Opted Out",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -288,
+        816
+      ],
+      "id": "dda9e83b-c091-445e-9428-f290ec1f99e0",
+      "name": "Update row in sheet",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Edit Fields').item.json[\"Gmail Message ID\"] }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        816
+      ],
+      "id": "12ca7e6c-fd1e-4d1b-a9dd-84d5288e4e9e",
+      "name": "Reply to a message1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "=Interested",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c1e8d07a-ce67-4955-b9fb-e7a05484f478"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Interested"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "dea89595-b391-4ec7-9f86-738130ddd14b",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "=Not Interested",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Not Interested"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "26deaec0-5ee1-4966-ac4b-badf536d4073",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "=Wants Appointment",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Wants Appointment"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        800
+      ],
+      "id": "749731fb-ebdb-4274-aca4-7f4817d5fa17",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_BUSINESS_EMAIL",
+          "mode": "list",
+          "cachedResultName": "YOUR_BUSINESS_EMAIL"
+        },
+        "start": "={{ $now.plus({ days: $now.weekday === 5 ? 3 : $now.weekday === 6 ? 2 : 1 }).set({ hour: 10, minute: 0, second: 0, millisecond: 0 }) }}",
+        "end": "={{ $now.plus({ days: $now.weekday === 5 ? 3 : $now.weekday === 6 ? 2 : 1 }).set({ hour: 11, minute: 0, second: 0, millisecond: 0 }) }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $('Gmail Trigger').item.json.from.value[0].address }}"
+          ],
+          "description": "Appointment automatically created from the AI Lead Reactivation workflow.",
+          "sendUpdates": "all",
+          "summary": "Property Consultation"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -288,
+        1008
+      ],
+      "id": "32eff5ac-82ea-4c68-9f21-c4a475881540",
+      "name": "Create an event"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Edit Fields').item.json[\"Gmail Message ID\"] }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        1008
+      ],
+      "id": "ef632278-3739-4fea-9802-b723923b385d",
+      "name": "Reply to a message2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Lead Reactivation System — Database"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 673428282,
+          "mode": "list",
+          "cachedResultName": "Sheet3"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Lead Email": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+            "Reply Message": "={{ $('Edit Fields').item.json[\"Reply Message\"] }}",
+            "Intent": "={{ $('Edit Fields1').item.json.Intent }}",
+            "Date Received": "={{ $now.toISO() }}",
+            "Appointment Status": "Booked",
+            "Appointment Start": "={{ $('Create an event').item.json.start }}",
+            "Appointment End": "={{ $('Create an event').item.json.end }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Lead Email",
+              "displayName": "Lead Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reply Message",
+              "displayName": "Reply Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Intent",
+              "displayName": "Intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Received",
+              "displayName": "Date Received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Appointment Status",
+              "displayName": "Appointment Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Appointment Start",
+              "displayName": "Appointment Start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Appointment End",
+              "displayName": "Appointment End",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        1008
+      ],
+      "id": "d9ba08ab-ed00-4fae-bdd9-ebc2c957012a",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You are a real estate assistant.\n\nWrite a short and professional reply to a lead who said they are not interested.\n\nRequirements:\n- Thank them for replying.\n- Respect their decision.\n- Confirm they will not receive further follow-up messages.\n- Keep the message short and natural.\n- Do not mention AI.\n- Return only the reply message."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        816
+      ],
+      "id": "0f643bcd-73e9-4e90-be0c-e3c0ee4c4d0a",
+      "name": "Message for not interested"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a real estate assistant.\n\nWrite a short confirmation message for a lead whose appointment has been successfully booked.\n\nAppointment details:\nDate: {{ $json.start.dateTime }}\nEnd: {{ $json.end.dateTime }}\n\nRequirements:\n- Confirm that the appointment was booked successfully.\n- Mention the scheduled date and time.\n- Keep it short and professional.\n- Do not mention AI.\n- Tell the lead they should have received a Google Calendar invitation.\n- Return only the message."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        1008
+      ],
+      "id": "8f969538-593c-4a54-b715-3b5f5a8a9e1b",
+      "name": "Message for wants appointment"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Lead_Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message for hot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message for warm",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message for low prio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Message_to_Campaign_Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HOT": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WARM": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "LOW PRIO": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Message for low prio": {
+      "main": [
+        [
+          {
+            "node": "LOW PRIO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message for warm": {
+      "main": [
+        [
+          {
+            "node": "WARM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message for hot": {
+      "main": [
+        [
+          {
+            "node": "HOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead_Classification": {
+      "main": [
+        [
+          {
+            "node": "Manual Mapping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Mapping": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message_to_Campaign_Log": {
+      "main": [
+        [
+          {
+            "node": "Campaign_Append row in sheet 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet 1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message for interested": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Message for not interested",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Message for interested",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Message for wants appointment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message for not interested": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message for wants appointment": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
