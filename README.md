@@ -124,10 +124,6 @@ Successfully tested:
 
 ![Lead Reactivation Workflow](workflow1.jpg)
 
-### Reply Handling & Appointment Booking Workflow
-
-![Reply Handling and Appointment Booking Workflow](workflow-reply-booking.png)
-
 ## Project Status
 
 **Completed — Portfolio Demonstration Project**
